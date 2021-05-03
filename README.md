@@ -1,7 +1,7 @@
 # PROJ831
 A School project about analysing and visualizing osu! data
 
-To be able to use this programm you need to create a file named "config.txt" and put it in the same directory as the .py files
+To be able to use this programm you need to create a file named "config.txt" and put it in the data folder.
 It will contain two values that must not be given to others
 
 The first value is the token of your discord bot that will respond to the user's texts.
