@@ -33,6 +33,16 @@ def set_profile(user, author):
     else:
         return ":x: This username is invalid"
 
+def get_username(author):
+    with open('data/players.json') as f:
+        players = json.load(f)
+        try:
+            return players[author]
+        except:
+            return ""
+            
+
+
 #return how long ago a certain date was
 def get_interval_of_time(time):
 
@@ -122,7 +132,7 @@ def make_embed_profile(response):
     return embed
 
 
-def make_embed_top(response, user):
+def make_embed_top(response, user, page):
     user = get_user(user)
     title = ":flag_" + user[0]['country'].lower() + ":  Top plays for " + user[0]['username'] + " in Catch the beat!"
     text_author = "Top plays for " + user[0]['username']
@@ -154,11 +164,16 @@ def make_embed_top(response, user):
         
         hyperlink = "(" + "https://osu.ppy.sh/beatmapsets/" + beatmap[0]['beatmapset_id'] + "#fruits/" + beatmap[0]['beatmap_id'] + ")"
 
-        description = "**" + str(score_id) + ". [" + beatmap[0]['title'] + " [" + beatmap[0]['version'] + "]]" + hyperlink + "** + " + get_mods(int(score['enabled_mods'])) + " [" + beatmap[0]['difficultyrating'][:4] + "★]" + "\n" 
+        description = "**" + str((page-1)*5 + score_id) + ". [" + beatmap[0]['title'] + " [" + beatmap[0]['version'] + "]]" + hyperlink + "** + " + get_mods(int(score['enabled_mods'])) + " [" + beatmap[0]['difficultyrating'][:4] + "★]" + "\n" 
         description += "-" + emotes_id[score['rank']] +  " -** " + score['pp'][:indice+2] + "pp **" + "- " + str(accuracy)[:5] + "% " + "- " + score['date'][:10] + "\n"
-        description += "- **Score:** " + score['score'] + ", **Combo:** " + score['maxcombo'] + "/" + score['maxcombo'] +  ", **Miss:** " + score['countmiss'] + ", **Dropmiss:** " + score['countkatu']
         
-        #The name of the field is not space but a special invisible character
+        if score['countmiss'] == '0':
+            description += "- **Score:** " + score['score'] + ", **Combo:** " + score['maxcombo'] + "/" + score['maxcombo'] +  ", **Miss:** " + score['countmiss'] + ", **Dropmiss:** " + score['countkatu']
+        else:
+            max_combo = get_beatmap(score['beatmap_id'], "0")[0]['max_combo']
+            description += "- **Score:** " + score['score'] + ", **Combo:** " + score['maxcombo'] + "/" + max_combo +  ", **Miss:** " + score['countmiss'] + ", **Dropmiss:** " + score['countkatu']
+        
+        #The name of the field is not space but a special invisible character, do not remove
         embed.add_field(name="ㅤ", value = description, inline=False)
         score_id += 1
 
@@ -167,8 +182,7 @@ def make_embed_top(response, user):
     return embed
 
 
-def make_embed_score(response, map_id):
-    beatmap = get_beatmap(map_id, "0")
+def make_embed_score(response, map_id, beatmap):
     text_author = "Top plays for " + response[0]['username'] + " on " + beatmap[0]['title'] + " [" + beatmap[0]['version'] + "]"
     description = ""
     
@@ -215,7 +229,7 @@ def make_embed_recent_score(user, response):
     description = "-" + emotes_id[score['rank']] +  " " +  str(accuracy)[:5] + "% " +  "  - Miss: " + score['countmiss'] + ", Dropmiss: " + score['countkatu'] + "\n"
     description += "-Score: " + score['score'] + ", Combo: " + score['maxcombo'] + "/" + beatmap[0]['max_combo'] 
     description += "\n\n"
-    text_footer = "Beatmap by " + beatmap[0]['creator'] + " | beatmap ID: " + beatmap[0]['beatmap_id'] + " | beatmapset ID: " + beatmap[0]['beatmapset_id']
+    text_footer = "Beatmap by " + beatmap[0]['creator'] + " | beatmap ID: " + beatmap[0]['beatmap_id']
     
     
     embed = discord.Embed(  title = "",

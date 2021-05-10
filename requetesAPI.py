@@ -36,6 +36,7 @@ def get_user(user):
     request = make_request("get_user", data)
     r = requests.get(request)
     profile = json.loads(r.text)
+    del profile[0]['events']
     return profile
 
 
@@ -54,7 +55,7 @@ def get_user_best(user):
     data = {"k" : k,
             "u" : user,
             "m" : "2",
-            "limit": "5"}
+            "limit": "100"}
     
     request = make_request("get_user_best", data)
     r = requests.get(request)
